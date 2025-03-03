@@ -1,3 +1,13 @@
+---
+title: "Lab 4: Importing NOAA Buoy Data from Monterey Bay"
+author: "Catalina Dorado"
+date: "March 2, 2025"
+format: gfm
+execute:
+  message: false
+  warning: false
+---
+
 # Part 1: Setup
 
 ## GitHub Workflow
@@ -36,9 +46,11 @@ This document is quite plain, meaning it does not have any special formatting. A
 
 In the code chunk below, load in the packages necessary for your analysis. You should only need the `tidyverse` package for this analysis.
 
-```{r}
+```{r setup}
 #| label: setup
 
+# Load necessary packages for data analysis
+library(tidyverse)
 ```
 
 # Part 2: Data Context
@@ -61,17 +73,22 @@ In addition, the data file also stores a "comment" in the second row that contai
 
 Finally, notice that the data storage type is `txt` which means we cannot use `read_csv()` to import the data. Instead
 
+
 ## Step 1: Reading the Data into `R`
 Read the data into R. Since it is a `txt` file it is considered a "whitespace-separated file".  Use the (readr)[https://readr.tidyverse.org/index.html] website to determine the appropriate `read_XXX()` function.  
 
 When you read in the data give it an appropriate name for what the data represents. The read in file should look like this (note this is just the first seven columns):  
 
-```{r}
+```{r data}
 #| label: load-data
+
+# Load data txt file website
+buoy <- read_table("https://jcanner.github.io/stat_210_2025_website/docs/labs/student/data/buoy_2024.txt")
 
 ```
 
 Notice that the data is all read in as a character value and the first row contains information that is not data, but additional information about the variables: this is called a "comment" in the data.  
+
 
 ## Step 2: Specify the Comment Row  
 In your data, you will notice the `#` in front of `yr` in the second row. That is the symbol that indicates a comment in the data set. Using the cheatsheet or the (readr)[https://readr.tidyverse.org/index.html] website, add an argument to your function that indicates that the comment row begins with `#`.  Your data should now look like this:
@@ -79,6 +96,14 @@ In your data, you will notice the `#` in front of `yr` in the second row. That i
 ```{r}
 #| label: load-data-comment
 
+buoy <- read_table("https://jcanner.github.io/stat_210_2025_website/docs/labs/student/data/buoy_2024.txt", comment = "#")
+
+# View the imported raw dataset
+view(buoy)
+
+# Save raw dataset to project folder
+save(buoy, file = "~/Documents/STATS_210_Spring_25/Labs/week6_lab4/data-raw/buoy.txt")
+write_csv(buoy, file = "~/Documents/STATS_210_Spring_25/Labs/week6_lab4/data-raw/buoy.csv")
 ```
 
 
@@ -88,16 +113,26 @@ We want to use snake_case for our variable names. Use the `janitor` package to c
 ```{r}
 #| label: clean-names
 
+# Load necessary package to clean variable names
+library(janitor)
+
+# Clean names so that month is `MM' to `mm` and minute is `mm` to `mm_2
+buoy |>
+  clean_names()
 ```
+
 
 ## Step 4: Write the Data Part 1
 We will have a bit of cleaning to do on the data, but we have an issue. The 99 and 999's in the data are numeric and not character values. In order for us to specify them as `NA`s we need to do a little work around.  
 
 Write the data to a `csv` file called `buoy_update.csv`. Be sure to write it to your `data-raw` folder.  
 
-```{r}
+```{r eval: false}
 #| label: write-data-part-1
 
+# Write data to a `csv` file
+write_csv(buoy, 
+          file = "~/Documents/STATS_210_Spring_25/Labs/week6_lab4/data-raw/buoy_update.csv")
 ```
 
 
@@ -110,24 +145,40 @@ Now we will read the data back in, be sure to assign the it a meaningful object 
 
 Remember that now we are reading back in a data file of type `csv`. Now when you look at the data we should have `NA` instead of `99` or `999` in our data, for example:
 
-```{r}
+```{r eval: false}
 #| label: load-data-again
 
+# Read in data, specify column type (defaults) as character, specify `NA`s as "99" and "999"
+buoy_update <- read_csv("~/Documents/STATS_210_Spring_25/Labs/week6_lab4/data-raw/buoy_update.csv", 
+                        col_types = list(.default = col_character()), 
+                        na = c("99", "999"))
+
+head(buoy_update)
 ```
 
 This is great! But we created another problem. Now all of our numeric values are being treated like characters and we don't want that. There are a couple of ways to fix this. We can write and reread in the data setting the column types to `double` or we can use the `readr` parsing functions. 
 
 Here is the code you can use to fix the data without exporting and importing again (we will learn more about the `mutate()` function. Insert whatever you called your buoy data on the last import for `your_file_name`.  
 
-```{r}
+```{r eval: false}
 #| label: parse-double
-buoy_final <- your_file_name |> 
+
+# Write and reread in the data, set column types to `double`
+buoy_final <- buoy_update |> 
   mutate(across(.cols = everything(), ~parse_double(.x)))
 ```
 
-
-
 Now we have our clean, correctly classified, data ready for analysis as `buoy_final`. Go ahead and write that data as a `csv` file into your `data-clean` file. Once you've done that. Set the data cleaning code chunks to `eval: false` so that you do not rerun them again when you render the document. 
+
+```{r}
+#| label: write-data-clean
+
+# Write data as csv into data-clean folder
+write_csv(buoy_final, 
+          file = "~/Documents/STATS_210_Spring_25/Labs/week6_lab4/data-clean/buoy_final.csv")
+
+head(buoy_final)
+```
 
 
 # Part 3: Recreate the Following Visualization
