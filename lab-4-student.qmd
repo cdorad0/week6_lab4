@@ -79,7 +79,7 @@ Read the data into R. Since it is a `txt` file it is considered a "whitespace-se
 
 When you read in the data give it an appropriate name for what the data represents. The read in file should look like this (note this is just the first seven columns):  
 
-```{r data}
+```{r eval: false}
 #| label: load-data
 
 # Load data txt file website
@@ -93,32 +93,27 @@ Notice that the data is all read in as a character value and the first row conta
 ## Step 2: Specify the Comment Row  
 In your data, you will notice the `#` in front of `yr` in the second row. That is the symbol that indicates a comment in the data set. Using the cheatsheet or the (readr)[https://readr.tidyverse.org/index.html] website, add an argument to your function that indicates that the comment row begins with `#`.  Your data should now look like this:
 
-```{r}
+```{r eval: false}
 #| label: load-data-comment
 
-buoy <- read_table("https://jcanner.github.io/stat_210_2025_website/docs/labs/student/data/buoy_2024.txt", comment = "#")
-
-# View the imported raw dataset
-view(buoy)
-
-# Save raw dataset to project folder
-save(buoy, file = "~/Documents/STATS_210_Spring_25/Labs/week6_lab4/data-raw/buoy.txt")
-write_csv(buoy, file = "~/Documents/STATS_210_Spring_25/Labs/week6_lab4/data-raw/buoy.csv")
+buoy <- read_table("https://jcanner.github.io/stat_210_2025_website/docs/labs/student/data/buoy_2024.txt", 
+                   comment = "#")
 ```
 
 
 ## Step 3: Clean the Variable Names  
 We want to use snake_case for our variable names. Use the `janitor` package to clean the variable names. Notice, that because month was originally coded `MM` and minute was originally coded `mm` that now month is `mm` and minute is `mm_2` to create a distinction between them.  
 
-```{r}
+```{r eval: false}
 #| label: clean-names
 
 # Load necessary package to clean variable names
 library(janitor)
 
 # Clean names so that month is `MM' to `mm` and minute is `mm` to `mm_2
-buoy |>
-  clean_names()
+buoy <- clean_names(buoy)
+
+buoy
 ```
 
 
@@ -136,7 +131,6 @@ write_csv(buoy,
 ```
 
 
-
 ## Step 5: Dealing with Missing Values  
 Now we will read the data back in, be sure to assign the it a meaningful object name, **BUT** we are going to do two things:  
 
@@ -145,15 +139,14 @@ Now we will read the data back in, be sure to assign the it a meaningful object 
 
 Remember that now we are reading back in a data file of type `csv`. Now when you look at the data we should have `NA` instead of `99` or `999` in our data, for example:
 
-```{r eval: false}
+```{r}
 #| label: load-data-again
 
 # Read in data, specify column type (defaults) as character, specify `NA`s as "99" and "999"
 buoy_update <- read_csv("~/Documents/STATS_210_Spring_25/Labs/week6_lab4/data-raw/buoy_update.csv", 
                         col_types = list(.default = col_character()), 
                         na = c("99", "999"))
-
-head(buoy_update)
+buoy_update
 ```
 
 This is great! But we created another problem. Now all of our numeric values are being treated like characters and we don't want that. There are a couple of ways to fix this. We can write and reread in the data setting the column types to `double` or we can use the `readr` parsing functions. 
@@ -166,18 +159,18 @@ Here is the code you can use to fix the data without exporting and importing aga
 # Write and reread in the data, set column types to `double`
 buoy_final <- buoy_update |> 
   mutate(across(.cols = everything(), ~parse_double(.x)))
+
+buoy_final
 ```
 
 Now we have our clean, correctly classified, data ready for analysis as `buoy_final`. Go ahead and write that data as a `csv` file into your `data-clean` file. Once you've done that. Set the data cleaning code chunks to `eval: false` so that you do not rerun them again when you render the document. 
 
-```{r}
+```{r eval: false}
 #| label: write-data-clean
 
 # Write data as csv into data-clean folder
 write_csv(buoy_final, 
           file = "~/Documents/STATS_210_Spring_25/Labs/week6_lab4/data-clean/buoy_final.csv")
-
-head(buoy_final)
 ```
 
 
@@ -187,8 +180,82 @@ Now that are data is "analytic ready", go ahead and read in your clean data and 
 ```{r}
 #| label: monterey-air-temp-viz
 
+# Read in data with object name
+canyon <- read_csv("~/Documents/STATS_210_Spring_25/Labs/week6_lab4/data-clean/buoy_final.csv", 
+                   show_col_types = FALSE)
+
+canyon
+```
+
+```{r}
+# View first few rows of the clean dataset
+names(canyon)
+
+# Identify the distinct years of the dataset
+canyon |>
+  distinct(yy)
+
+# Identify the distinct months of the dataset
+canyon |>
+  distinct(mm)
+```
+
+
+```{r}
+# Select months and air temperature for the dataset for the year, 2024
+
+air_temp <- canyon |> 
+  select(c(2, 14))
+
+# View first few lines of the dataset
+head(air_temp)
+```
+
+```{r}
+# Plot the initial data points on a simple scatterplot
+ggplot(air_temp, aes(x = mm, y = atmp)) + 
+  geom_point()
 
 ```
+
+```{r}
+# Add a smooth line with aesthetic `color` black
+ggplot(air_temp, aes(x = mm, y = atmp)) + 
+  geom_jitter() + 
+  geom_smooth(color = "black")
+
+```
+
+```{r}
+# Add appropriate titles and colors
+ggplot(air_temp, aes(x = mm, y = atmp)) +
+  geom_jitter(aes(color = factor(mm)), alpha = 0.1, width = .1) + 
+  labs(x = "Months in 2024",
+       y = "Air Temperature (Celcius)",
+       title = "Monterey Bay Canyon Air Temperature in 2024",
+       caption = "Source: NOAA National Data Buoy Center") + 
+   geom_smooth(color = "black")
+```
+
+
+```{r}
+# Add breaks to the x axis and add additional themes to the plot
+ggplot(air_temp, aes(x = mm, y = atmp)) +
+  geom_jitter(aes(color = factor(mm)), alpha = 0.1, width = .1) + 
+  labs(x = "Months in 2024",
+       y = "Air Temperature (Celcius)",
+       title = "Monterey Bay Canyon Air Temperature in 2024",
+       caption = "Source: NOAA National Data Buoy Center") +
+  geom_smooth(color = "black") + 
+  scale_x_continuous(breaks = seq(1, 12, 1)) + 
+  theme_light() + 
+  theme(axis.title = element_text(size = rel(.9))) + 
+  theme(title = element_text(size = rel(.9))) + 
+  theme(axis.text = element_text(size = rel(.7))) + 
+  theme(legend.position = "none") + 
+  scale_colour_viridis_d()
+```
+
 
 # Part 4: Find a Data Set
 

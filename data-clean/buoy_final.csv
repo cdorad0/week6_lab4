@@ -1,4 +1,4 @@
-YY,MM,DD,hh,mm,WDIR,WSPD,GST,WVHT,DPD,APD,MWD,PRES,ATMP,WTMP,DEWP,VIS,TIDE
+yy,mm,dd,hh,mm_2,wdir,wspd,gst,wvht,dpd,apd,mwd,pres,atmp,wtmp,dewp,vis,tide
 2024,1,1,0,18,60,2.1,NA,NA,NA,NA,NA,1018.6,13.5,14.5,NA,NA,NA
 2024,1,1,1,18,80,1,NA,NA,NA,NA,NA,1018.6,13.5,14.5,NA,NA,NA
 2024,1,1,2,18,100,1.5,NA,NA,NA,NA,NA,1018.9,13.7,14.5,NA,NA,NA

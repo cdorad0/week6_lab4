@@ -154,14 +154,8 @@ website, add an argument to your function that indicates that the
 comment row begins with `#`. Your data should now look like this:
 
 ``` r
-buoy <- read_table("https://jcanner.github.io/stat_210_2025_website/docs/labs/student/data/buoy_2024.txt", comment = "#")
-
-# View the imported raw dataset
-view(buoy)
-
-# Save raw dataset to project folder
-save(buoy, file = "~/Documents/STATS_210_Spring_25/Labs/week6_lab4/data-raw/buoy.txt")
-write_csv(buoy, file = "~/Documents/STATS_210_Spring_25/Labs/week6_lab4/data-raw/buoy.csv")
+buoy <- read_table("https://jcanner.github.io/stat_210_2025_website/docs/labs/student/data/buoy_2024.txt", 
+                   comment = "#")
 ```
 
 ## Step 3: Clean the Variable Names
@@ -176,8 +170,9 @@ month is `mm` and minute is `mm_2` to create a distinction between them.
 library(janitor)
 
 # Clean names so that month is `MM' to `mm` and minute is `mm` to `mm_2
-buoy |>
-  clean_names()
+buoy <- clean_names(buoy)
+
+buoy
 ```
 
     # A tibble: 8,525 × 18
@@ -229,20 +224,24 @@ in our data, for example:
 buoy_update <- read_csv("~/Documents/STATS_210_Spring_25/Labs/week6_lab4/data-raw/buoy_update.csv", 
                         col_types = list(.default = col_character()), 
                         na = c("99", "999"))
-
-head(buoy_update)
+buoy_update
 ```
 
-    # A tibble: 6 × 18
-      YY    MM    DD    hh    mm    WDIR  WSPD  GST   WVHT  DPD   APD   MWD   PRES  
-      <chr> <chr> <chr> <chr> <chr> <chr> <chr> <chr> <chr> <chr> <chr> <chr> <chr> 
-    1 2024  01    01    00    18    60    2.1   <NA>  <NA>  <NA>  <NA>  <NA>  1018.6
-    2 2024  01    01    01    18    80    1     <NA>  <NA>  <NA>  <NA>  <NA>  1018.6
-    3 2024  01    01    02    18    100   1.5   <NA>  <NA>  <NA>  <NA>  <NA>  1018.9
-    4 2024  01    01    03    18    80    1.5   <NA>  <NA>  <NA>  <NA>  <NA>  1019.2
-    5 2024  01    01    04    18    60    1.5   <NA>  <NA>  <NA>  <NA>  <NA>  1019.2
-    6 2024  01    01    05    18    350   4.1   <NA>  <NA>  <NA>  <NA>  <NA>  1019.4
-    # ℹ 5 more variables: ATMP <chr>, WTMP <chr>, DEWP <chr>, VIS <chr>, TIDE <chr>
+    # A tibble: 8,525 × 18
+       yy    mm    dd    hh    mm_2  wdir  wspd  gst   wvht  dpd   apd   mwd   pres 
+       <chr> <chr> <chr> <chr> <chr> <chr> <chr> <chr> <chr> <chr> <chr> <chr> <chr>
+     1 2024  01    01    00    18    60    2.1   <NA>  <NA>  <NA>  <NA>  <NA>  1018…
+     2 2024  01    01    01    18    80    1     <NA>  <NA>  <NA>  <NA>  <NA>  1018…
+     3 2024  01    01    02    18    100   1.5   <NA>  <NA>  <NA>  <NA>  <NA>  1018…
+     4 2024  01    01    03    18    80    1.5   <NA>  <NA>  <NA>  <NA>  <NA>  1019…
+     5 2024  01    01    04    18    60    1.5   <NA>  <NA>  <NA>  <NA>  <NA>  1019…
+     6 2024  01    01    05    18    350   4.1   <NA>  <NA>  <NA>  <NA>  <NA>  1019…
+     7 2024  01    01    06    18    20    4.1   <NA>  <NA>  <NA>  <NA>  <NA>  1019…
+     8 2024  01    01    07    18    30    4.1   <NA>  <NA>  <NA>  <NA>  <NA>  1019…
+     9 2024  01    01    08    18    60    2.6   <NA>  <NA>  <NA>  <NA>  <NA>  1019…
+    10 2024  01    01    09    18    70    4.1   <NA>  <NA>  <NA>  <NA>  <NA>  1019…
+    # ℹ 8,515 more rows
+    # ℹ 5 more variables: atmp <chr>, wtmp <chr>, dewp <chr>, vis <chr>, tide <chr>
 
 This is great! But we created another problem. Now all of our numeric
 values are being treated like characters and we don’t want that. There
@@ -259,7 +258,25 @@ Insert whatever you called your buoy data on the last import for
 # Write and reread in the data, set column types to `double`
 buoy_final <- buoy_update |> 
   mutate(across(.cols = everything(), ~parse_double(.x)))
+
+buoy_final
 ```
+
+    # A tibble: 8,525 × 18
+          yy    mm    dd    hh  mm_2  wdir  wspd   gst  wvht   dpd   apd   mwd  pres
+       <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+     1  2024     1     1     0    18    60   2.1    NA    NA    NA    NA    NA 1019.
+     2  2024     1     1     1    18    80   1      NA    NA    NA    NA    NA 1019.
+     3  2024     1     1     2    18   100   1.5    NA    NA    NA    NA    NA 1019.
+     4  2024     1     1     3    18    80   1.5    NA    NA    NA    NA    NA 1019.
+     5  2024     1     1     4    18    60   1.5    NA    NA    NA    NA    NA 1019.
+     6  2024     1     1     5    18   350   4.1    NA    NA    NA    NA    NA 1019.
+     7  2024     1     1     6    18    20   4.1    NA    NA    NA    NA    NA 1019.
+     8  2024     1     1     7    18    30   4.1    NA    NA    NA    NA    NA 1020.
+     9  2024     1     1     8    18    60   2.6    NA    NA    NA    NA    NA 1020.
+    10  2024     1     1     9    18    70   4.1    NA    NA    NA    NA    NA 1020.
+    # ℹ 8,515 more rows
+    # ℹ 5 more variables: atmp <dbl>, wtmp <dbl>, dewp <dbl>, vis <dbl>, tide <dbl>
 
 Now we have our clean, correctly classified, data ready for analysis as
 `buoy_final`. Go ahead and write that data as a `csv` file into your
@@ -271,20 +288,7 @@ render the document.
 # Write data as csv into data-clean folder
 write_csv(buoy_final, 
           file = "~/Documents/STATS_210_Spring_25/Labs/week6_lab4/data-clean/buoy_final.csv")
-
-head(buoy_final)
 ```
-
-    # A tibble: 6 × 18
-         YY    MM    DD    hh    mm  WDIR  WSPD   GST  WVHT   DPD   APD   MWD  PRES
-      <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
-    1  2024     1     1     0    18    60   2.1    NA    NA    NA    NA    NA 1019.
-    2  2024     1     1     1    18    80   1      NA    NA    NA    NA    NA 1019.
-    3  2024     1     1     2    18   100   1.5    NA    NA    NA    NA    NA 1019.
-    4  2024     1     1     3    18    80   1.5    NA    NA    NA    NA    NA 1019.
-    5  2024     1     1     4    18    60   1.5    NA    NA    NA    NA    NA 1019.
-    6  2024     1     1     5    18   350   4.1    NA    NA    NA    NA    NA 1019.
-    # ℹ 5 more variables: ATMP <dbl>, WTMP <dbl>, DEWP <dbl>, VIS <dbl>, TIDE <dbl>
 
 # Part 3: Recreate the Following Visualization
 
@@ -293,6 +297,141 @@ data and use it to try and recreate the following visualization. Do your
 best to match the following visualization as close as possible. (Hint:
 when specifying color, you may need to use `factor()` to get R to treat
 a continuous value as discrete).
+
+``` r
+# Read in data with object name
+canyon <- read_csv("~/Documents/STATS_210_Spring_25/Labs/week6_lab4/data-clean/buoy_final.csv", 
+                   show_col_types = FALSE)
+
+canyon
+```
+
+    # A tibble: 8,525 × 18
+          yy    mm    dd    hh  mm_2  wdir  wspd gst   wvht  dpd   apd   mwd    pres
+       <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <lgl> <lgl> <lgl> <lgl> <lgl> <dbl>
+     1  2024     1     1     0    18    60   2.1 NA    NA    NA    NA    NA    1019.
+     2  2024     1     1     1    18    80   1   NA    NA    NA    NA    NA    1019.
+     3  2024     1     1     2    18   100   1.5 NA    NA    NA    NA    NA    1019.
+     4  2024     1     1     3    18    80   1.5 NA    NA    NA    NA    NA    1019.
+     5  2024     1     1     4    18    60   1.5 NA    NA    NA    NA    NA    1019.
+     6  2024     1     1     5    18   350   4.1 NA    NA    NA    NA    NA    1019.
+     7  2024     1     1     6    18    20   4.1 NA    NA    NA    NA    NA    1019.
+     8  2024     1     1     7    18    30   4.1 NA    NA    NA    NA    NA    1020.
+     9  2024     1     1     8    18    60   2.6 NA    NA    NA    NA    NA    1020.
+    10  2024     1     1     9    18    70   4.1 NA    NA    NA    NA    NA    1020.
+    # ℹ 8,515 more rows
+    # ℹ 5 more variables: atmp <dbl>, wtmp <dbl>, dewp <lgl>, vis <lgl>, tide <lgl>
+
+``` r
+# View first few rows of the clean dataset
+names(canyon)
+```
+
+     [1] "yy"   "mm"   "dd"   "hh"   "mm_2" "wdir" "wspd" "gst"  "wvht" "dpd" 
+    [11] "apd"  "mwd"  "pres" "atmp" "wtmp" "dewp" "vis"  "tide"
+
+``` r
+# Identify the distinct years of the dataset
+canyon |>
+  distinct(yy)
+```
+
+    # A tibble: 1 × 1
+         yy
+      <dbl>
+    1  2024
+
+``` r
+# Identify the distinct months of the dataset
+canyon |>
+  distinct(mm)
+```
+
+    # A tibble: 12 × 1
+          mm
+       <dbl>
+     1     1
+     2     2
+     3     3
+     4     4
+     5     5
+     6     6
+     7     7
+     8     8
+     9     9
+    10    10
+    11    11
+    12    12
+
+``` r
+# Select months and air temperature for the dataset for the year, 2024
+
+air_temp <- canyon |> 
+  select(c(2, 14))
+
+# View first few lines of the dataset
+head(air_temp)
+```
+
+    # A tibble: 6 × 2
+         mm  atmp
+      <dbl> <dbl>
+    1     1  13.5
+    2     1  13.5
+    3     1  13.7
+    4     1  13.8
+    5     1  13.8
+    6     1  13.7
+
+``` r
+# Plot the initial data points on a simple scatterplot
+ggplot(air_temp, aes(x = mm, y = atmp)) + 
+  geom_point()
+```
+
+![](lab-4-student_files/figure-commonmark/unnamed-chunk-5-1.png)
+
+``` r
+# Add a smooth line with aesthetic `color` black
+ggplot(air_temp, aes(x = mm, y = atmp)) + 
+  geom_jitter() + 
+  geom_smooth(color = "black")
+```
+
+![](lab-4-student_files/figure-commonmark/unnamed-chunk-6-1.png)
+
+``` r
+# Add appropriate titles and colors
+ggplot(air_temp, aes(x = mm, y = atmp)) +
+  geom_jitter(aes(color = factor(mm)), alpha = 0.1, width = .1) + 
+  labs(x = "Months in 2024",
+       y = "Air Temperature (Celcius)",
+       title = "Monterey Bay Canyon Air Temperature in 2024",
+       caption = "Source: NOAA National Data Buoy Center") + 
+   geom_smooth(color = "black")
+```
+
+![](lab-4-student_files/figure-commonmark/unnamed-chunk-7-1.png)
+
+``` r
+# Add breaks to the x axis and add additional themes to the plot
+ggplot(air_temp, aes(x = mm, y = atmp)) +
+  geom_jitter(aes(color = factor(mm)), alpha = 0.1, width = .1) + 
+  labs(x = "Months in 2024",
+       y = "Air Temperature (Celcius)",
+       title = "Monterey Bay Canyon Air Temperature in 2024",
+       caption = "Source: NOAA National Data Buoy Center") +
+  geom_smooth(color = "black") + 
+  scale_x_continuous(breaks = seq(1, 12, 1)) + 
+  theme_light() + 
+  theme(axis.title = element_text(size = rel(.9))) + 
+  theme(title = element_text(size = rel(.9))) + 
+  theme(axis.text = element_text(size = rel(.7))) + 
+  theme(legend.position = "none") + 
+  scale_colour_viridis_d()
+```
+
+![](lab-4-student_files/figure-commonmark/unnamed-chunk-8-1.png)
 
 # Part 4: Find a Data Set
 
