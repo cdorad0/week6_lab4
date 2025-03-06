@@ -6,6 +6,9 @@ format: gfm
 execute:
   message: false
   warning: false
+  embed-resources: true
+  code-tools: true
+  echo: true
 ---
 
 # Part 1: Setup
@@ -270,9 +273,17 @@ One fun source for data is [Tidy Tuesday](https://github.com/rfordatascience/tid
 
 **For your found data write a brief description of the data and and provide its source.**
 
->Insert your description and link to your source here. Identify 2-3 research questions you could try to answer with this data.  
+> The dataset I will be using is from an organization I previously worked with from a marine science course. This dataset was made available through DATAOne provided by PISCO (Partnership for Interdisciplinary Studies of Coastal Oceans). The dataset includes a large scale, long-term monitoring study of kelp forest ecosystems along portions of the southern, central and northern coast of California and southern Oregon, USA. The purpose of this dataset was to identify the regional and temporal patterns of the kelp forest ecosystem structure and observe spatial and temporal patterns. Species recorded for this study include fishes, invertebrates, and macroalgae. I will be focusing my data on kelp species, requiring me to refer to the supporting csv file that provides the taxon table for recorded species. I plan to tidy my data, focusing on a few number of kelp species at a specific site. The dataset is quite large and will need to be cleaned throughly. Key variables that are included in the dataset is the site, year, month, number of transects, classcode (species), and number of species observed.
 
+[DataONE website (search)]: (https://search.dataone.org/view/doi%3A10.6085%2FAA%2FPISCO_kelpforest.1.10)
 
+Identify 2-3 research questions you could try to answer with this data.  
+
+> 1. How did the population dynamics kelp species change before, during, and after a very strong El Niño (2015-2016)? [El Niño and La Niña and Intensities] : (https://ggweather.com/enso/oni.htm)
+
+> 2. Is there a significant difference in the population of kelp species across spatial distributions over a 5 year period?
+
+> 3. How did the 2015-16 El Niño event affect the distribution of kelp species in Central California?
 
 
 # Lab 4 Submission
